@@ -74,12 +74,16 @@ against FlareIntel's numbers would be a good sanity check either way.
 
 ## Data sources
 
-- **Satellite detections**: NOAA/NASA VIIRS Nightfire (radiant heat +
-  location of combustion sources at night), via
-  [flaringmonitor/viirs-flare-data](https://github.com/flaringmonitor/viirs-flare-data) —
-  a public mirror that requires no signup. The official source
-  ([eogdata.mines.edu](https://eogdata.mines.edu/products/vnf/)) has more
-  current data but requires a free account; worth pursuing for v1.
+- **Satellite detections**: VIIRS is the imaging instrument flown on
+  NASA/NOAA satellites (Suomi NPP, NOAA-20); **Nightfire** is the
+  detection algorithm — developed by the Earth Observation Group (EOG)
+  at the Colorado School of Mines, not by NASA or NOAA — that processes
+  VIIRS data into actual flare locations and radiant heat (Elvidge et
+  al., 2013). This project uses
+  [flaringmonitor/viirs-flare-data](https://github.com/flaringmonitor/viirs-flare-data),
+  a public mirror of EOG's output that requires no signup. EOG's own
+  site ([eogdata.mines.edu](https://eogdata.mines.edu/products/vnf/)) has
+  more current data but requires a free account; worth pursuing for v1.
 - **Well locations & operators**: same mirror, sourced from Texas
   Railroad Commission well records.
 - **State-reported flaring volumes**: same mirror, sourced from Texas

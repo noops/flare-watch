@@ -1,11 +1,15 @@
-"""Pull VIIRS satellite flare-detection data, Texas well locations, and
+"""Pull VIIRS Nightfire flare-detection data, Texas well locations, and
 Texas state-reported flaring volumes — all public, no registration.
 
-Source: flaringmonitor/viirs-flare-data on GitHub, which mirrors NOAA's
-VIIRS Nightfire product (satellite radiant-heat detections of gas flares)
-alongside cleaned well/operator metadata from state regulators. The
-official source (eogdata.mines.edu) requires a free account; this mirror
-doesn't, so it's the actual no-signup public entry point for this data.
+VIIRS is the imaging instrument on NASA/NOAA satellites; Nightfire is
+the detection algorithm that turns VIIRS data into actual flare
+locations and radiant heat, developed by the Earth Observation Group
+(EOG) at the Colorado School of Mines — not a NASA/NOAA product.
+
+Source: flaringmonitor/viirs-flare-data on GitHub, which mirrors EOG's
+Nightfire output alongside cleaned well/operator metadata from state
+regulators. EOG's own site (eogdata.mines.edu) requires a free account;
+this mirror doesn't, so it's the actual no-signup public entry point.
 
 Texas filtering uses a real polygon (via states.csv.gz's geometry), not a
 lat/lon bounding box — Texas and New Mexico share a border right through
