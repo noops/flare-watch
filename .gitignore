@@ -2,9 +2,6 @@ __pycache__/
 *.pyc
 .venv/
 venv/
-.env
-.env.local
-data/raw/
-data/interim/
-*.ipynb_checkpoints
 .DS_Store
+data/raw/
+results/tx_detections_with_operator.csv

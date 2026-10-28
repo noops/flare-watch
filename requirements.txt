@@ -1,0 +1,6 @@
+pandas
+requests
+matplotlib
+shapely
+scikit-learn
+certifi
