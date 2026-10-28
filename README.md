@@ -38,8 +38,9 @@ commit to the underlying repo was June 28, 2021, about two months after
 it started, and `flaringmonitor.org` itself is dead now (connection
 refused as of this writing). "Flare Watch" is aspirational for now. This
 v0 proves the pipeline and the Texas-specific analysis work correctly on
-real satellite data; getting current data is the clear next step (see
-Known Limitations).
+real satellite data. Getting current *flare-level* data turned out to be
+genuinely blocked, not just unfinished — see Known Limitations for why
+EOG's official source doesn't work for a project like this one.
 
 Within that window, the data checks out against reality: both satellite
 detections and state-reported volumes crater in exactly the months
@@ -98,10 +99,22 @@ against FlareIntel's numbers would be a good sanity check either way.
 
 ## Known limitations (v1 candidates)
 
-- **Not current.** The single biggest gap. Registering for a free EOG
-  account would unlock current VIIRS Nightfire data; re-running this
-  pipeline against that feed (same Texas-polygon filter, same spatial
-  join) is the natural v1.
+- **Not current, and EOG direct access turned out to be a dead end —
+  not just a matter of registering.** Checked it properly: free account
+  registration is only step one. VNF data itself requires a separate
+  signed license, with exactly three categories — Academic (free, but
+  requires institutional affiliation), Commercial (paid, cost
+  undisclosed), and Non-Profit (paid annual subscription, "for qualified
+  organizations"). There's no tier for an independent individual project.
+  Effective June 2026, even a free account's *programmatic* access is
+  paid-subscriber-only regardless of license category — free accounts
+  get manual browser downloads at best. Not pursuing this further for
+  this project. **Climate TRACE** (free, live via API, verified working —
+  `api.climatetrace.org/v7/sources`) is the real current-data option, but
+  it reports modeled CO2e emissions per oil/gas play, not per-flare
+  detections — it could supplement the trend chart the way
+  `tx_reported_flares.csv` already does, not replace the map or the
+  operator leaderboard.
 - **2km match radius wasn't tuned.** Chosen as a reasonable-sounding
   default, not validated against ground truth.
 - **Detection counts, not flare volumes.** The operator leaderboard
