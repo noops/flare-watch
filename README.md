@@ -1,17 +1,59 @@
 # Flare Watch
 
 Where Texas oil & gas flaring happens, who's nearest to it, and how it's
-trended — built on public satellite data, no registration required.
+trended — built on public satellite data.
 
-Status: **v0 — real analysis on real (if dated) data.** Part of
+Status: **v1 — actually current now, via a different NASA system than
+the one that was a dead end.** Part of
 [Bat City AI](https://batcityai.com)'s Year One programs.
 
-## What it does
+## Quickstart (current data)
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
+# Free, instant, no institutional review (unlike EOG — see below):
+# https://firms.modaps.eosdis.nasa.gov/api/map_key/
+echo "FIRMS_MAP_KEY=your_key_here" > .env
+
+python3 scripts/fetch_firms.py    # ~10s: last 5 days, 3 VIIRS satellites
+python3 scripts/current_flares.py # ~10s: map + operator leaderboard
+```
+
+Produces a map and a "top operators" leaderboard from the **last 5
+days** of real satellite detections — genuinely current, not the 2019-2021
+historical data described further down.
+
+## Why NASA FIRMS instead of EOG's VIIRS Nightfire
+
+We originally tried to get current data from EOG (Colorado School of
+Mines), the official source for the historical data below. That turned
+out to be a real dead end for a project like this one — see
+[Known Limitations](#known-limitations). **FIRMS is a different system**:
+NASA's own active-fire/thermal-anomaly detection algorithm, run on the
+same VIIRS satellites, with instant free access (just an email) instead
+of EOG's academic/commercial/non-profit license tiers.
+
+**The honest tradeoff**: FIRMS is built to detect wildfires, not flares
+specifically — it flags any persistent heat source. In the Permian Basin
+and Eagle Ford (sparse desert/scrubland, dense with known well clusters,
+little wildfire risk), a detection recurring at the same point night
+after night is almost certainly a flare. This script doesn't prove that;
+it's the same kind of reasonable-first-pass logic as the nearest-well
+attribution below, not a certainty.
+
+**A second, more interesting finding**: fixing the *detection* data
+exposed that the *well location* data (`tx_wells.csv`, used for operator
+attribution) is still the 2021 snapshot. Match rate against a known well
+within 2km dropped from 92% (historical) to **53% (current)** — wells
+drilled after 2021 that are now flaring simply aren't in the well
+dataset yet. Current detections, stale attribution: a real example of
+fixing one bottleneck and immediately finding the next one.
+
+## Historical analysis (2019-2021)
+
+```bash
 python3 scripts/fetch_data.py   # ~1 min: downloads + Texas-filters the data
 python3 scripts/analyze.py      # ~30s: map, trend, operator leaderboard
 ```
@@ -23,111 +65,101 @@ Produces:
   The 2020 oil crash is visible in both series.
 - **A "top operators" leaderboard** — each detection matched to its
   nearest Texas well (within 2km) via a spatial join, then counted up by
-  operator.
+  operator. 92% of detections matched within 2km here, vs. 53% for the
+  current FIRMS data above — see why in the section above.
 
-## The honest caveat that matters most
-
-**This data runs from January 2019 to May 2021 — it is not current.**
-Here's why: "Flaring Monitor," the project behind this GitHub mirror,
-was a one-time open-data release in [May 2021](https://www.axios.com/2021/05/11/natural-gas-flaring-monitor)
+**This data runs from January 2019 to May 2021 only.** Here's why:
+"Flaring Monitor," the project behind this GitHub mirror, was a one-time
+open-data release in [May 2021](https://www.axios.com/2021/05/11/natural-gas-flaring-monitor)
 by [Bazean](https://www.crunchbase.com/organization/bazean), a Houston
 oil & gas analytics company, accompanying a white paper on satellite-
-based flare-volume estimation. It wasn't a funded ongoing public-interest
-monitor — more a one-time demo tied to a product/PR launch. The last
-commit to the underlying repo was June 28, 2021, about two months after
-it started, and `flaringmonitor.org` itself is dead now (connection
-refused as of this writing). "Flare Watch" is aspirational for now. This
-v0 proves the pipeline and the Texas-specific analysis work correctly on
-real satellite data. Getting current *flare-level* data turned out to be
-genuinely blocked, not just unfinished — see Known Limitations for why
-EOG's official source doesn't work for a project like this one.
-
-Within that window, the data checks out against reality: both satellite
-detections and state-reported volumes crater in exactly the months
-Texas drilling activity actually crashed (the COVID demand shock +
-2020 oil price war).
+based flare-volume estimation — not a funded ongoing monitor, more a
+one-time demo tied to a product/PR launch. The last commit to the
+underlying repo was June 28, 2021; `flaringmonitor.org` itself is dead
+now. Within that window the data checks out against reality: both
+satellite detections and state-reported volumes crater in exactly the
+months Texas drilling activity actually crashed (the COVID demand shock
++ 2020 oil price war).
 
 ## Why a real polygon, not a bounding box
 
 Texas and New Mexico share a border that runs straight through the
 Permian Basin — exactly where most of this flaring happens. A naive
 lat/lon bounding box around Texas would scoop up New Mexico detections.
-`fetch_data.py` uses Texas's actual boundary polygon (from the same
-dataset) for an exact point-in-polygon filter instead: of ~501,000
-detections in the Texas bounding box, **71,000 (14%) were actually
-across the border in New Mexico** and get correctly excluded.
+Both `fetch_data.py` and `fetch_firms.py` use Texas's actual boundary
+polygon for an exact point-in-polygon filter instead: of ~501,000
+historical detections in the Texas bounding box, **71,000 (14%) were
+actually across the border in New Mexico** and get correctly excluded.
 
 ## The operator leaderboard isn't a legal claim
 
 "Nearest well within 2km" is a reasonable first-pass attribution, not
 proof a specific well caused a specific flare. Flares can be offset from
 the wellhead, wells cluster tightly together, and satellite geolocation
-has its own error. 92% of detections matched a well within 2km; the
-other 8% are excluded from the leaderboard rather than guessed at.
+has its own error.
 
 ## Prior art
 
 [FlareIntel](https://flareintel.com) (by Capterio) is a global, more
-polished, more current flare tracker built on the same VIIRS/Nightfire
-data, with operator and field attribution already built in — worth
-knowing about before assuming this space is empty. As far as public
-documentation shows, FlareIntel Free gives annualized aggregates through
-an interactive map, with daily/near-real-time data reserved for the paid
+polished flare tracker built on the official EOG Nightfire data, with
+operator and field attribution already built in — worth knowing about
+before assuming this space is empty. As far as public documentation
+shows, FlareIntel Free gives annualized aggregates through an
+interactive map, with daily/near-real-time data reserved for the paid
 Pro tier, and no confirmed bulk CSV export or API for either. This
 project is narrower (Texas only) but open end to end: every raw input
 file, the exact spatial-join logic, and the full attributed-detection
 output are all re-runnable and inspectable, not a hosted black box.
-Worth revisiting this comparison once v1 has current data — a head-to-head
-against FlareIntel's numbers would be a good sanity check either way.
 
 ## Data sources
 
-- **Satellite detections**: VIIRS is the imaging instrument flown on
-  NASA/NOAA satellites (Suomi NPP, NOAA-20); **Nightfire** is the
-  detection algorithm — developed by the Earth Observation Group (EOG)
-  at the Colorado School of Mines, not by NASA or NOAA — that processes
-  VIIRS data into actual flare locations and radiant heat (Elvidge et
-  al., 2013). This project uses
+- **Current detections**: [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/)
+  — VIIRS thermal-anomaly detections (Suomi NPP, NOAA-20, NOAA-21),
+  NASA's own active-fire algorithm, free instant API key.
+- **Historical detections (2019-2021)**: VIIRS is the imaging instrument
+  on NASA/NOAA satellites; **Nightfire** is the flare-specific detection
+  algorithm — developed by the Earth Observation Group (EOG) at the
+  Colorado School of Mines, not NASA/NOAA (Elvidge et al., 2013) — via
   [flaringmonitor/viirs-flare-data](https://github.com/flaringmonitor/viirs-flare-data),
-  a public mirror of EOG's output that requires no signup. EOG's own
-  site ([eogdata.mines.edu](https://eogdata.mines.edu/products/vnf/)) has
-  more current data but requires a free account; worth pursuing for v1.
-- **Well locations & operators**: same mirror, sourced from Texas
-  Railroad Commission well records.
-- **State-reported flaring volumes**: same mirror, sourced from Texas
-  Railroad Commission reporting.
+  a public mirror of EOG's output.
+- **Well locations, operators, and state-reported flaring volumes**:
+  same historical mirror, sourced from Texas Railroad Commission
+  records. Not current (see above) — this is the actual bottleneck on
+  the current pipeline's operator attribution, not the detections.
 
-## Known limitations (v1 candidates)
+## Known limitations
 
-- **Not current, and EOG direct access turned out to be a dead end —
-  not just a matter of registering.** Checked it properly: free account
-  registration is only step one. VNF data itself requires a separate
-  signed license, with exactly three categories — Academic (free, but
-  requires institutional affiliation), Commercial (paid, cost
-  undisclosed), and Non-Profit (paid annual subscription, "for qualified
-  organizations"). There's no tier for an independent individual project.
-  Effective June 2026, even a free account's *programmatic* access is
-  paid-subscriber-only regardless of license category — free accounts
-  get manual browser downloads at best. Not pursuing this further for
-  this project. **Climate TRACE** (free, live via API, verified working —
-  `api.climatetrace.org/v7/sources`) is the real current-data option, but
+- **Current operator attribution is bottlenecked by stale well data**
+  (53% match rate vs. 92% historical) — getting a current TX well list
+  (the Railroad Commission publishes one) would fix this directly, and
+  is the highest-value next step.
+- **FIRMS isn't flare-specific.** It's a wildfire-detection system that
+  happens to catch flares as a side effect. No validation yet that
+  Texas detections aren't occasionally real fires, agricultural burns,
+  or other industrial heat sources.
+- **EOG's official VIIRS Nightfire access is a genuine dead end for this
+  project, not just unfinished.** Checked properly: free registration is
+  only step one. VNF data itself requires a separate signed license with
+  exactly three categories — Academic (free, but requires institutional
+  affiliation), Commercial (paid, cost undisclosed), and Non-Profit
+  (paid annual subscription, "for qualified organizations"). None fit an
+  independent individual project. Effective June 2026, even a free
+  account's programmatic access is paid-subscriber-only regardless of
+  license category.
+- **Climate TRACE** (free, live via API, verified working —
+  `api.climatetrace.org/v7/sources`) could supplement the trend chart —
   it reports modeled CO2e emissions per oil/gas play, not per-flare
-  detections — it could supplement the trend chart the way
-  `tx_reported_flares.csv` already does, not replace the map or the
-  operator leaderboard.
+  detections, so it's a trend indicator, not a map/leaderboard source.
 - **2km match radius wasn't tuned.** Chosen as a reasonable-sounding
   default, not validated against ground truth.
-- **Detection counts, not flare volumes.** The operator leaderboard
-  counts satellite detections, which isn't the same as total gas flared
-  — a well flaring continuously for a month and one flaring for a single
-  night could show up very differently depending on satellite pass
-  timing. `rh` (radiant heat) is in the data and unused — summing it
-  per operator would be a more physically meaningful metric than a raw
-  count.
+- **Detection counts, not flare volumes.** The operator leaderboards
+  count satellite detections, which isn't the same as total gas flared.
+  `frp`/`rh` (radiant heat / fire radiative power) are in both datasets
+  and unused — summing them per operator would be more physically
+  meaningful than a raw count.
 - **No temporal pattern analysis.** Do specific operators flare more at
   night, on weekends, or right before reporting deadlines? The data
-  (timestamps + state-reported monthly totals) could answer this; it
-  hasn't been asked yet.
+  could answer this; it hasn't been asked yet.
 
 ## License
 

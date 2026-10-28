@@ -3,5 +3,6 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+.env
 data/raw/
 results/tx_detections_with_operator.csv
