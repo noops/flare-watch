@@ -28,11 +28,18 @@ Produces:
 ## The honest caveat that matters most
 
 **This data runs from January 2019 to May 2021 — it is not current.**
-The dataset this project builds on (see Data Sources) stopped being
-updated at some point; it is not a live feed. "Flare Watch" is
-aspirational for now. This v0 proves the pipeline and the Texas-specific
-analysis work correctly on real satellite data; getting current data
-is the clear next step (see Known Limitations).
+Here's why: "Flaring Monitor," the project behind this GitHub mirror,
+was a one-time open-data release in [May 2021](https://www.axios.com/2021/05/11/natural-gas-flaring-monitor)
+by [Bazean](https://www.crunchbase.com/organization/bazean), a Houston
+oil & gas analytics company, accompanying a white paper on satellite-
+based flare-volume estimation. It wasn't a funded ongoing public-interest
+monitor — more a one-time demo tied to a product/PR launch. The last
+commit to the underlying repo was June 28, 2021, about two months after
+it started, and `flaringmonitor.org` itself is dead now (connection
+refused as of this writing). "Flare Watch" is aspirational for now. This
+v0 proves the pipeline and the Texas-specific analysis work correctly on
+real satellite data; getting current data is the clear next step (see
+Known Limitations).
 
 Within that window, the data checks out against reality: both satellite
 detections and state-reported volumes crater in exactly the months
