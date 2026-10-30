@@ -25,6 +25,14 @@ Produces a map and a "top operators" leaderboard from the **last 5
 days** of real satellite detections — genuinely current, not the 2019-2021
 historical data described further down.
 
+Both maps (this one and the historical one below) render on a real
+basemap — state lines, rivers, cities, terrain — via `scripts/mapping.py`.
+Worth knowing: two of the three "free" tile providers tried first didn't
+actually work unauthenticated (CartoDB now requires an API key;
+OpenStreetMap's own tiles reject library/script access per their usage
+policy, not a bug). Esri's World Topo tiles are the ones that are
+genuinely open for this.
+
 ## Why NASA FIRMS instead of EOG's VIIRS Nightfire
 
 We originally tried to get current data from EOG (Colorado School of
