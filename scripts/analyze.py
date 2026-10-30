@@ -13,6 +13,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
+
+from mapping import plot_texas_detections
 from sklearn.neighbors import BallTree
 
 MAX_MATCH_KM = 2.0  # don't attribute a detection to a well more than this far away
@@ -69,15 +71,13 @@ def main() -> None:
     print(f"Saved {RESULTS_DIR / 'monthly_trend.png'}")
 
     # --- Map of detection density ---
-    fig2, ax = plt.subplots(figsize=(7, 8))
-    ax.scatter(detections["lon_gmtco"], detections["lat_gmtco"], s=0.5, alpha=0.15, color="tab:red")
     date_range = f"{detections['date_ltz'].min().strftime('%b %Y')}-{detections['date_ltz'].max().strftime('%b %Y')}"
-    ax.set_title(f"{len(detections):,} VIIRS flare detections in Texas, {date_range}")
-    ax.set_xlabel("Longitude")
-    ax.set_ylabel("Latitude")
-    ax.set_aspect("equal")
-    fig2.tight_layout()
-    fig2.savefig(RESULTS_DIR / "detection_map.png", dpi=150)
+    plot_texas_detections(
+        detections["lon_gmtco"], detections["lat_gmtco"],
+        title=f"{len(detections):,} VIIRS flare detections in Texas, {date_range}",
+        out_path=RESULTS_DIR / "detection_map.png",
+        color="red", s=0.6, alpha=0.2, edgecolors="none",
+    )
     print(f"Saved {RESULTS_DIR / 'detection_map.png'}")
 
     # --- Nearest-well operator attribution ---

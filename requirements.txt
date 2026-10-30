@@ -5,3 +5,4 @@ shapely
 scikit-learn
 certifi
 python-dotenv
+contextily
