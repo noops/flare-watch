@@ -3,7 +3,9 @@
 Where Texas oil & gas flaring happens, who's nearest to it, and how it's
 trended — built on public satellite data.
 
-Status: **v1 
+Status: **v1 — actually current now, via a different NASA system than
+the one that was a dead end.** Part of
+[Bat City AI](https://batcityai.com)'s Year One programs.
 
 ## Quickstart (current data)
 
