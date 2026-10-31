@@ -33,6 +33,8 @@ OpenStreetMap's own tiles reject library/script access per their usage
 policy, not a bug). Esri's World Topo tiles are the ones that are
 genuinely open for this.
 
+![Current VIIRS nighttime thermal detections, Texas](results/current_detection_map.png)
+
 ## Why NASA FIRMS instead of EOG's VIIRS Nightfire
 
 We originally tried to get current data from EOG (Colorado School of
@@ -75,6 +77,10 @@ Produces:
   nearest Texas well (within 2km) via a spatial join, then counted up by
   operator. 92% of detections matched within 2km here, vs. 53% for the
   current FIRMS data above — see why in the section above.
+
+![430,279 VIIRS flare detections in Texas, Jan 2019-May 2021](results/detection_map.png)
+
+![Texas flaring: satellite detections vs. state-reported volume](results/monthly_trend.png)
 
 **This data runs from January 2019 to May 2021 only.** Here's why:
 "Flaring Monitor," the project behind this GitHub mirror, was a one-time
